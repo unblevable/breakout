@@ -237,35 +237,7 @@
         for (var i = 0; i < BRICK_ROWS; i++) {
             for (var j = 0; j < BRICK_COLUMNS; j++) {
                 if (!bricks[i][j].broken) {
-                    var brickWidth = bricks[i][j].width,
-                        brickHeight= bricks[i][j].height,
-                        color;
-
-                    // The color of a brick depends on its row.
-                    switch(i) {
-                        case 0:
-                            color = COLOR_BLACK;
-                            break;
-                        case 1:
-                            color = '#e84a5f';
-                            break;
-                        case 2:
-                            color = '#ff847c';
-                            break;
-                        case 3:
-                            color = '#fece78';
-                            break;
-                        default:
-                            color = '#99b898';
-                            break;
-                    }
-
-
-                    canvas.beginPath();
-                    canvas.rect(bricks[i][j].x - brickWidth / 2, bricks[i][j].y - brickHeight / 2, brickWidth, brickHeight);
-
-                    canvas.fillStyle = color;
-                    canvas.fill();
+                    bricks[i][j].draw(canvas);
                 }
             }
         }
