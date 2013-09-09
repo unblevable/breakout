@@ -61,6 +61,13 @@
         this.height = this.radius * 2;
 
         this.color = COLOR_BLACK;
+
+        this.draw = function (canvas) {
+            canvas.beginPath();
+            canvas.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+            canvas.fillStyle = this.color;
+            canvas.fill();
+        }
     }
 
     function Paddle () {
@@ -70,14 +77,32 @@
         this.width = 35;
         this.height = 4;
         this.color = COLOR_BLACK;
+
+        this.draw = function (canvas) {
+            canvas.beginPath();
+            canvas.rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+            canvas.fillStyle = this.color;
+            canvas.fill();
+        }
     }
 
-    function Brick () {
+    function Brick (color) {
         this.x = 0;
         this.y = 0;
         this.width = 40;
         this.height = 20;
         this.broken = false;
+        this.color = color;
+
+        this.draw = function (canvas) {
+            if (!this.broken) {
+                canvas.beginPath();
+                canvas.rect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+
+                canvas.fillStyle = this.color;
+                canvas.fill();
+            }
+        }
     }
 
 
@@ -113,10 +138,31 @@
         for (var i = 0; i < BRICK_ROWS; i++) {
             bricks[i] = [];
             for (var j = 0; j < BRICK_COLUMNS; j++) {
-                brick = new Brick();
+                var color;
+
+                // The color of a brick depends on its row.
+                switch(i) {
+                    case 0:
+                        color = COLOR_BLACK;
+                        break;
+                    case 1:
+                        color = '#e84a5f';
+                        break;
+                    case 2:
+                        color = '#ff847c';
+                        break;
+                    case 3:
+                        color = '#fece78';
+                        break;
+                    default:
+                        color = '#99b898';
+                        break;
+                }
+                brick = new Brick(color);
                 brick.x = j * brick.width + brick.width / 2;
                 brick.y = i * brick.height + brick.height / 2;
                 bricks[i][j] = brick;
+
             }
         }
 
@@ -182,16 +228,10 @@
         clear();
 
         // ball
-        canvas.beginPath();
-        canvas.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI, false);
-        canvas.fillStyle = ball.color;
-        canvas.fill();
+        ball.draw(canvas);
 
         // paddle
-        canvas.beginPath();
-        canvas.rect(paddle.x - paddle.width / 2, paddle.y - paddle.height / 2, paddle.width, paddle.height);
-        canvas.fillStyle = paddle.color;
-        canvas.fill();
+        paddle.draw(canvas);
 
         // bricks
         for (var i = 0; i < BRICK_ROWS; i++) {
