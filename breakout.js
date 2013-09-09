@@ -1,5 +1,5 @@
 (function () {
-    var FRAMES_PER_SECOND = 60,
+    var FRAMES_PER_SECOND = 30,
     PADDLE_VERTICAL_OFFSET = 40,
     BRICK_ROWS = 5,
     BRICK_COLUMNS = 10,
@@ -51,10 +51,15 @@
         this.y = 0;
 
         // velocity
-        this.vx = 9;
-        this.vy = -9;
+        this.vx = 6.5;
+        this.vy = -6.5;
 
         this.radius = 2;
+
+        // for convenience
+        this.width = this.radius * 2;
+        this.height = this.radius * 2;
+
         this.color = COLOR_BLACK;
     }
 
@@ -119,7 +124,7 @@
         loop = setInterval(function () {
                 update();
                 draw();
-                }, FRAMES_PER_SECOND);
+                }, 1000 / FRAMES_PER_SECOND);
     }
 
     // update game logic each frame
@@ -145,7 +150,7 @@
         // check ball-paddle collision
         if (ball.x - ball.radius + ball.vx < paddle.x + paddle.width / 2 &&
                 ball.x + ball.radius + ball.vx > paddle.x - paddle.width / 2 &&
-                // ball.y - ball.radius < paddle.y + paddle.height / 2 &&
+                ball.y - ball.radius < paddle.y + paddle.height / 2 &&
                 ball.y + ball.radius + ball.vy> paddle.y - paddle.height / 2) {
             ball.vy *= -1;
         }
