@@ -69,6 +69,11 @@
             canvas.fillStyle = this.color;
             canvas.fill();
         }
+
+        this.move = function () {
+            this.x += this.vx;
+            this.y += this.vy;
+        }
     }
 
     function Paddle () {
@@ -176,24 +181,31 @@
 
     // update game logic each frame
     function update () {
-        // increase difficulty
-        var DIFFICULTY_CONSTANT = 5;
-        if (ball.vx > 0) {
-            ball.vx = START_VELOCITY + score / DIFFICULTY_CONSTANT;
-        } else if (ball.vx < 0) {
-            ball.vx = -START_VELOCITY - score / DIFFICULTY_CONSTANT;
-        }
-
-        if (ball.vy > 0) {
-            ball.vy = START_VELOCITY + score / DIFFICULTY_CONSTANT;
-        } else if (ball.vy < 0) {
-            ball.vy = -START_VELOCITY - score / DIFFICULTY_CONSTANT;
-        }
         // handle keyboard input
         if (activeKeys['37'] && paddle.x - paddle.width / 2 > 0) {
             paddle.x -= paddle.vx;
         } else if (activeKeys['39'] && paddle.x + paddle.width / 2 < width) {
             paddle.x += paddle.vx;
+        }
+
+        // check ball-paddle collision
+        if (isColliding(ball, paddle)) {
+            ball.vy *= -1;
+        }
+
+        // check ball-brick collision
+        for (var i = 0; i < BRICK_ROWS; i++) {
+            for (var j = 0; j < BRICK_COLUMNS; j++) {
+                var brick = bricks[i][j];
+
+                if (!brick.broken) {
+                    if (isColliding(ball, brick)) {
+                        brick.broken = true;
+                        ball.vy *= -1;
+                        score++;
+                    }
+                }
+            }
         }
 
         // check edge collisions
@@ -207,34 +219,7 @@
             initialize();
         }
 
-        // check ball-paddle collision
-        if (ball.x - ball.radius + ball.vx < paddle.x + paddle.width / 2 &&
-                ball.x + ball.radius + ball.vx > paddle.x - paddle.width / 2 &&
-                ball.y - ball.radius < paddle.y + paddle.height / 2 &&
-                ball.y + ball.radius + ball.vy> paddle.y - paddle.height / 2) {
-            ball.vy *= -1;
-        }
-
-        // check ball-brick collision
-        for (var i = 0; i < BRICK_ROWS; i++) {
-            for (var j = 0; j < BRICK_COLUMNS; j++) {
-                var brick = bricks[i][j];
-
-                if (!brick.broken) {
-                    if (ball.x - ball.radius < brick.x + brick.width / 2 &&
-                            ball.x + ball.radius > brick.x - brick.width / 2 &&
-                            ball.y - ball.radius < brick.y + brick.height &&
-                            ball.y + ball.radius > brick.y - brick.height) {
-                        bricks[i][j].broken = true;
-                        ball.vy *= -1;
-                        score++;
-                    }
-                }
-            }
-        }
-
-        ball.x += ball.vx;
-        ball.y += ball.vy;
+        ball.move();
     }
 
     // render canvas graphics each frame
@@ -263,9 +248,17 @@
     }
 
     // initialize canvas to background color each frame
-    function clear() {
+    function clear () {
         canvas.fillStyle = '#eeeeee';
         canvas.fillRect(0, 0, width, height);
+    }
+
+    // bounding-box collision detection
+    function isColliding (a, b) {
+        return ball.x - a.width / 2 < b.x + b.width / 2 &&
+                            a.x + a.width / 2 > b.x - b.width / 2 &&
+                            a.y - a.height / 2 < b.y + b.height &&
+                            a.y + a.height / 2 > b.y - b.height;
     }
 })();
 
