@@ -6,6 +6,7 @@
     SCORE_HORIZONTAL_OFFSET = 12,
     SCORE_VERTICAL_OFFSET = 12,
     COLOR_BLACK = '#2a363b',
+    START_VELOCITY = 6.5,
 
     canvasElement,
 
@@ -33,15 +34,15 @@
 
     // event listeners ------------------------------------------------------------
 
-    $(document).on({
-            'ready': initialize,
-            'keydown' : function (event) {
-            activeKeys[event.which] = true;
-            },
-            'keyup' : function (event) {
-            activeKeys[event.which] = false;
-            }
-            });
+    document.addEventListener('DOMContentLoaded', function () {
+        initialize();
+    }, false);
+    document.addEventListener('keydown', function (event) {
+        activeKeys[event.keyCode] = true;
+    }, false);
+    document.addEventListener('keyup', function (event) {
+        activeKeys[event.keyCode] = false;
+    }, false);
 
     // constructors ---------------------------------------------------------------
 
@@ -109,13 +110,13 @@
     // other functions ------------------------------------------------------------
 
     function initialize () {
-        canvasElement = $('canvas');
-        canvas = canvasElement.get(0).getContext('2d');
-        width = $('canvas').width();
-        height = $('canvas').height();
+        canvasElement = document.getElementsByTagName('canvas')[0];
+        canvas = canvasElement.getContext('2d');
+        width = canvasElement.offsetWidth;
+        height = canvasElement.offsetHeight;
 
-        activeKeys = {},
-                ball = {};
+        activeKeys = {};
+        ball = {};
         paddle = {};
         bricks = [];
         score = 0;
@@ -175,6 +176,19 @@
 
     // update game logic each frame
     function update () {
+        // increase difficulty
+        var DIFFICULTY_CONSTANT = 5;
+        if (ball.vx > 0) {
+            ball.vx = START_VELOCITY + score / DIFFICULTY_CONSTANT;
+        } else if (ball.vx < 0) {
+            ball.vx = -START_VELOCITY - score / DIFFICULTY_CONSTANT;
+        }
+
+        if (ball.vy > 0) {
+            ball.vy = START_VELOCITY + score / DIFFICULTY_CONSTANT;
+        } else if (ball.vy < 0) {
+            ball.vy = -START_VELOCITY - score / DIFFICULTY_CONSTANT;
+        }
         // handle keyboard input
         if (activeKeys['37'] && paddle.x - paddle.width / 2 > 0) {
             paddle.x -= paddle.vx;
